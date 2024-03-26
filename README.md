@@ -1,2 +1,2 @@
-# NaverRealestateCrawlingProgramGUI
-NaverRealestateCrawlingProgram with GUI
+# NaverRealestateCrawlingProgram
+NaverRealestateCrawlingProgram
