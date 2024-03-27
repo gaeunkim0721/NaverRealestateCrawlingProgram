@@ -34,25 +34,35 @@ user_agents = [
 ]
 # 프록시 서버 목록
 proxies_list = [
+    {"http": "http://189.240.60.171:9090", "https": "http://189.240.60.171:9090"},
+    {"http": "http://84.214.150.146:8080", "https": "http://84.214.150.146:8080"},
+    {"http": "http://134.209.105.209:3128", "https": "http://134.209.105.209:3128"},
+    {"http": "http://5.75.132.26:3129", "https": "http://5.75.132.26:3129"},
+    {"http": "http://189.240.60.163:9090", "https": "http://189.240.60.163:9090"},
+    {"http": "http://2.58.56.39:80", "https": "http://2.58.56.39:80"},
+    {"http": "http://114.129.2.82:8081", "https": "http://114.129.2.82:8081"},
+    {"http": "http://20.37.207.8:8080", "https": "http://20.37.207.8:8080"},
     {"http": "http://35.185.196.38:3128", "https": "http://35.185.196.38:3128"},
     {"http": "http://208.196.136.141:3128", "https": "http://208.196.136.141:3128"},
     {"http": "http://8.219.97.248:80", "https": "http://8.219.97.248:80"},
-    {"http": "http://5.252.23.220:3128", "https": "http://5.252.23.220:3128"},
-    {"http": "http://41.216.183.18:8080", "https": "http://41.216.183.18:8080"},
-    {"http": "http://72.10.160.171:29855", "https": "http://72.10.160.171:29855"},
-    {"http": "http://2.58.56.39:80", "https": "http://2.58.56.39:80"},
-    {"http": "http://109.108.40.238:8090", "https": "http://109.108.40.238:8090"},
-    {"http": "http://112.78.188.42:8080", "https": "http://112.78.188.42:8080"},
-    {"http": "http://188.93.237.29:3128", "https": "http://188.93.237.29:3128"},
-    {"http": "http://4.180.165.171:8080", "https": "http://4.180.165.171:8080"},
-    {"http": "http://112.78.188.46:8080", "https": "http://112.78.188.46:8080"},
-    {"http": "http://66.70.238.78:8888", "https": "http://66.70.238.78:8888"},
-    {"http": "http://134.209.105.209:3128", "https": "http://134.209.105.209:3128"},
-    {"http": "http://20.247.228.80:80", "https": "http://20.247.228.80:80"},
-    {"http": "http://8.222.152.158:55555", "https": "http://8.222.152.158:55555"},
-    # 추가 프록시는 이와 같은 방식으로 리스트에 추가하면 됩니다.
+    {"http": "http://129.213.171.187:3128", "https": "http://129.213.171.187:3128"},
+    {"http": "http://150.136.163.144:3128", "https": "http://150.136.163.144:3128"},
+    {"http": "http://72.10.164.178:1075", "https": "http://72.10.164.178:1075"},
+    {"http": "http://67.43.227.230:3075", "https": "http://67.43.227.230:3075"},
+    {"http": "http://72.10.160.94:5771", "https": "http://72.10.160.94:5771"},
+    {"http": "http://67.43.227.226:20913", "https": "http://67.43.227.226:20913"},
+    {"http": "http://72.10.160.173:3299", "https": "http://72.10.160.173:3299"},
+    {"http": "http://163.172.4.109:8080", "https": "http://163.172.4.109:8080"},
+    {"http": "http://67.43.236.18:9105", "https": "http://67.43.236.18:9105"},
+    # 추가된 프록시는 이와 같은 방식으로 리스트에 추가해주세요.
 ]
 
+
+counttimes = 0
+
+keyword = "서울"
+
+url = "https://m.land.naver.com/search/result/{}".format(keyword)
 
 
 selected_proxy = random.choice(proxies_list)
@@ -77,11 +87,35 @@ for proxy in proxies_list:
 print(f"\n작동하는 프록시 목록: {working_proxies}")
 
 
+
+working_user_agents = []
+
+for user_agent in user_agents:
+    headers = {
+        "User-Agent": user_agent
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            print(f"작동하는 User-Agent: {user_agent}")
+            working_user_agents.append(user_agent)
+        else:
+            print(f"차단된 User-Agent: {user_agent}, 상태 코드: {response.status_code}")
+    except Exception as e:
+        print(f"오류 발생: {user_agent}, 오류 메시지: {str(e)}")
+
+# 작동하는 User-Agent 출력
+print("\n작동하는 User-Agent 목록:")
+for agent in working_user_agents:
+    print(agent)
+
+
+
 selected_proxy = random.choice(working_proxies)
 
 
 # 랜덤하게 1개의 User-Agent 선택
-user_agent = random.choice(user_agents)
+user_agent = random.choice(working_user_agents)
 
 
 headers={
@@ -96,10 +130,6 @@ headers={
                 "Accept": "application/json",
             }
 
-
-keyword = "서울"
-
-url = "https://m.land.naver.com/search/result/{}".format(keyword)
 
 try:
     res = requests.get(url ,data={"isOnlyIsale":"false"},proxies=selected_proxy, headers=headers)
@@ -146,6 +176,10 @@ try:
 
     # 큰 원으로 구성되어 있는 전체 매물그룹(values)을 load 하여 한 그룹씩 세부 쿼리 진행
     for v in values:
+        user_agent = random.choice(working_user_agents)
+
+        selected_proxy = random.choice(working_proxies)
+
         lgeo = v['lgeo']
         count = v['count']
         z2 = v['z']
@@ -159,8 +193,7 @@ try:
                 "rletTpCd={}&tradTpCd={}&z={}&lat={}&""lon={}&totCnt={}&cortarNo={}&page={}"\
                 .format(lgeo, lgeo, rletTpCd, tradTpCd, z2, lat2, lon2, count,cortarNo, idx)
 
-            # time.sleep(random.uniform(0.5, 2.0))
-
+            
             res3 = requests.get(remaked_URL2,data={"isOnlyIsale":"false"},proxies=selected_proxy, headers=headers)
             json_str2 = json.loads(json.dumps(res3.json()))
 
@@ -178,14 +211,18 @@ try:
                     flrInfo = article.get('flrInfo')      # 층 정보
                     rltrNm = article.get('rltrNm')        # 부동산 중개사
                     detailUrl = f"https://m.land.naver.com/article/info/{atclNo}"  # 상세 페이지 URL
+                    counttimes += 1
 
                     # 여기에서 매물 정보를 출력하거나 다른 처리를 할 수 있습니다.
                     print(f"매물 번호: {atclNo}, 유형: {rletTpNm}, 거래 유형: {tradTpNm}, 가격: {prc}, 면적: {spc1}/{spc2}, 층: {flrInfo}, 중개사: {rltrNm}, 상세 페이지: {detailUrl}")
-
+                print(counttimes)
+                if counttimes % 100 == 1:
+                    time.sleep(1,3)
             except ValueError as e:
                 print(f"JSON 파싱 오류: {e}")
 
             except Exception as ex:
+
                 print(f"에러 발생: {ex}")
                 
     print("Request success with User-Agent:", user_agent)
